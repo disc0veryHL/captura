@@ -1,7 +1,7 @@
 {
   "name": "captura",
   "productName": "Captura",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Captura — photo library, Picasa-style viewer and screenshot tool for Windows",
   "author": "Captura",
   "main": "electron/main.mjs",

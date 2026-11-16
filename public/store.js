@@ -1,5 +1,5 @@
 // Shared state, API client, thumbnail generation queue, small helpers.
-import { t } from './i18n.js';
+import { t, uiLocale } from './i18n.js';
 import { renderEdited, downscale, dHash, canvasToBlob, normalizeEdits } from './pipeline.js';
 
 export const state = {
@@ -276,7 +276,7 @@ export function fmtBytes(n) {
   do { n /= 1024; i++; } while (n >= 1024 && i < 2);
   return n.toFixed(n < 10 ? 1 : 0) + ' ' + u[i];
 }
-export const fmtDate = (ts, opts = { dateStyle: 'medium' }) => new Intl.DateTimeFormat(undefined, opts).format(new Date(ts));
+export const fmtDate = (ts, opts = { dateStyle: 'medium' }) => new Intl.DateTimeFormat(uiLocale(), opts).format(new Date(ts));
 export function fmtExposure(s) { if (!s) return null; return s >= 1 ? s + 's' : '1/' + Math.round(1 / s); }
 
 let toastTimer;

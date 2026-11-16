@@ -97,6 +97,7 @@ export default {
   "Dark": "深色",
   "Days with lots of photos, grouped automatically.": "照片较多的日子，自动分组。",
   "Default": "默认",
+  "Delete": "删除",
   "Delete album": "删除相册",
   "Delete selected annotation": "删除所选标注",
   "Delete “{name}”?": "删除“{name}”？",

@@ -83,9 +83,9 @@ const redo = () => { if (E.si < E.states.length - 1) restore(E.si + 1); };
 // ---------------- toolbar & options ----------------
 function buildToolbar() {
   const tools = $('#tools');
-  for (const t of TOOLS) {
-    if (t === '|') { tools.append(h('span', { class: 'sep' })); continue; }
-    const [id, key, label, svg] = t;
+  for (const item of TOOLS) {
+    if (item === '|') { tools.append(h('span', { class: 'sep' })); continue; }
+    const [id, key, label, svg] = item;
     const k = keysFor('sx.' + id)[0];
     tools.append(h('button', { class: 'tbtn', 'data-tool': id, title: t(label) + (k ? ` (${prettyCombo(k)})` : ''), html: svg, onclick: () => setTool(id) }));
   }
@@ -123,7 +123,7 @@ function setTool(t) {
 function buildOptions() {
   const o = $('#opts');
   o.innerHTML = '';
-  const t = E.tool === 'select' && E.shapes[E.sel] ? E.shapes[E.sel].type : E.tool;
+  const kind = E.tool === 'select' && E.shapes[E.sel] ? E.shapes[E.sel].type : E.tool;
   const apply = (k, v) => { E[k] = v; const s = E.shapes[E.sel]; if (s && k in KEYMAP) { s[KEYMAP[k]] = v; record(); } render(); };
   const grp = (...kids) => h('div', { class: 'grp' }, ...kids);
   const range = (label, k, min, max) => {
@@ -143,13 +143,13 @@ function buildOptions() {
     c.onchange = () => apply(k, c.checked);
     return h('label', { class: 'chk' }, c, label);
   };
-  if (t === 'crop') {
+  if (kind === 'crop') {
     o.append(h('span', { class: 'hint' }, t('Drag to choose the area to keep, then press Enter or ✓. Esc cancels.')),
       h('button', { class: 'btn sm primary', onclick: applyCrop }, t('✓ Apply crop')), h('button', { class: 'btn sm', onclick: () => { E.crop = null; render(); } }, t('Reset')));
     return;
   }
-  if (t === 'select' && E.sel < 0) { o.append(h('span', { class: 'hint' }, t('Click a shape to select it. Drag to move, drag handles to resize, Delete removes it.'))); return; }
-  const usesColor = !['blur', 'pixelate', 'magnify', 'spotlight', 'eraser'].includes(t);
+  if (kind === 'select' && E.sel < 0) { o.append(h('span', { class: 'hint' }, t('Click a shape to select it. Drag to move, drag handles to resize, Delete removes it.'))); return; }
+  const usesColor = !['blur', 'pixelate', 'magnify', 'spotlight', 'eraser'].includes(kind);
   if (usesColor) {
     const sw = h('div', { class: 'grp' });
     const drawSw = () => {
@@ -162,15 +162,16 @@ function buildOptions() {
     drawSw();
     o.append(sw);
   }
-  if (['rect', 'ellipse', 'line', 'arrow', 'pen', 'magnify'].includes(t)) o.append(range(t('Width'), 'width', 1, 30));
-  if (['rect', 'ellipse'].includes(t)) o.append(check(t('Fill'), 'fill'));
-  if (t === 'arrow') o.append(seg('arrow', [['modern', t('Modern')], ['classic', t('Classic')], ['double', t('Double')], ['line', t('Open')]]));
-  if (['text', 'balloon', 'step'].includes(t)) o.append(range(t('Size'), 'font', 12, 120));
-  if (t === 'text') o.append(check(t('Background'), 'fill'));
-  if (t === 'step') o.append(seg('stepStyle', [['num', '1 2 3'], ['ABC', 'A B C'], ['abc', 'a b c'], ['ROM', 'I II III'], ['rom', 'i ii iii']]));
-  if (['blur', 'pixelate'].includes(t)) o.append(range(t('Strength'), 'strength', 2, 40));
-  if (['rect', 'ellipse', 'line', 'arrow', 'pen', 'text', 'balloon', 'step'].includes(t)) o.append(check(t('Shadow'), 'shadow'));
-  if (t === 'select') o.append(h('button', { class: 'btn sm', onclick: deleteSelected }, 'Delete'));
+  if (['rect', 'ellipse', 'line', 'arrow', 'pen', 'magnify'].includes(kind)) o.append(range(t('Width'), 'width', 1, 30));
+  if (['rect', 'ellipse'].includes(kind)) o.append(check(t('Fill'), 'fill'));
+  if (kind === 'arrow') o.append(seg('arrow', [['modern', t('Modern')], ['classic', t('Classic')], ['double', t('Double')], ['line', t('Line')]]));
+  if (['text', 'balloon', 'step'].includes(kind)) o.append(range(t('Size'), 'font', 12, 120));
+  if (kind === 'text') o.append(check(t('Background'), 'fill'));
+  if (kind === 'step') o.append(seg('stepStyle', [['num', '1 2 3'], ['ABC', 'A B C'], ['abc', 'a b c'], ['ROM', 'I II III'], ['rom', 'i ii iii']]));
+  if (['blur', 'pixelate'].includes(kind)) o.append(range(t('Strength'), 'strength', 2, 40));
+  if (['rect', 'ellipse', 'line', 'arrow', 'pen', 'text', 'balloon', 'step'].includes(kind)) o.append(check(t('Shadow'), 'shadow'));
+  // a selected annotation can be deleted from the bar (kind is the shape type here, not 'select')
+  if (E.tool === 'select' && E.sel >= 0) o.append(h('button', { class: 'btn sm', onclick: deleteSelected }, t('Delete')));
 }
 const KEYMAP = { color: 'color', width: 'width', fill: 'fill', shadow: 'shadow', arrow: 'arrow', stepStyle: 'style', font: 'font', strength: 'strength' };
 
@@ -410,9 +411,9 @@ cv.addEventListener('pointerdown', (e) => {
   finishText();
   cv.setPointerCapture(e.pointerId);
   const [x, y] = pos(e);
-  const t = E.tool;
-  if (t === 'crop') { E.crop = { x1: x, y1: y, x2: x, y2: y }; E.drag = { mode: 'crop' }; return; }
-  if (t === 'select') {
+  const tool = E.tool;
+  if (tool === 'crop') { E.crop = { x1: x, y1: y, x2: x, y2: y }; E.drag = { mode: 'crop' }; return; }
+  if (tool === 'select') {
     const s = E.shapes[E.sel];
     const hs = 9 / E.zoom;
     const hnd = handlesOf(s).find(([, hx, hy]) => Math.abs(x - hx) < hs && Math.abs(y - hy) < hs);
@@ -422,18 +423,18 @@ cv.addEventListener('pointerdown', (e) => {
     if (E.sel >= 0) E.drag = { mode: 'move', x, y, orig: JSON.stringify(E.shapes[E.sel]), moved: false };
     render(); return;
   }
-  if (t === 'text') {
+  if (tool === 'text') {
     const hit = hitTest(x, y);
     if (hit >= 0 && E.shapes[hit].type === 'text') return editText(hit);
     E.shapes.push({ ...newShape('text', x, y), x, y, text: '' });
     return editText(E.shapes.length - 1, true);
   }
-  if (t === 'step') {
+  if (tool === 'step') {
     const n = E.shapes.filter((s) => s.type === 'step').length + 1;
     E.shapes.push({ ...newShape('step', x, y), x, y, n });
     record(); render(); return;
   }
-  const s = newShape(t, x, y);
+  const s = newShape(tool, x, y);
   E.shapes.push(s);
   E.drag = { mode: 'draw', s, sx: x, sy: y };
   render();

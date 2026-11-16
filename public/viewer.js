@@ -241,8 +241,8 @@ function renderInfo() {
     if (e.key === 'Enter' && tagIn.value.trim()) { await patchPhotos([p.id], { addTag: tagIn.value.trim() }); renderInfo(); }
   });
   P.append(h('div', { class: 'ed-group' }, t('Tags')), tagIn,
-    h('div', { class: 'chips' }, p.tags.map((t) => h('span', { class: 'chip' }, t,
-      h('button', { title: t('Remove'), onclick: async () => { await patchPhotos([p.id], { tags: p.tags.filter((x) => x !== t) }); renderInfo(); } }, '×')))));
+    h('div', { class: 'chips' }, p.tags.map((tag) => h('span', { class: 'chip' }, tag,
+      h('button', { title: t('Remove'), onclick: async () => { await patchPhotos([p.id], { tags: p.tags.filter((x) => x !== tag) }); renderInfo(); } }, '×')))));
 
   // albums
   const sel = h('select', { class: 'select', style: { width: '100%' } }, h('option', { value: '' }, t('Add to album…')),
@@ -532,7 +532,7 @@ window.addEventListener('resize', () => { if (V.ed) draw(); });
 // ---------------- keyboard ----------------
 document.addEventListener('keydown', (e) => {
   if (!root.classList.contains('show') || $('#modal').classList.contains('show')) return;
-  if (e.target.matches('input, textarea, select') && e.key !== 'Escape') return;
+  if (e.target.matches?.('input, textarea, select') && e.key !== 'Escape') return;
   const ed = V.ed;
   if (e.key === 'Escape') { if (document.fullscreenElement) return; ed ? exitEdit() : close(); }
   else if (ed && isKey(e, 'ed.redo')) { e.preventDefault(); redo(); }

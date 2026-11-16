@@ -4,11 +4,11 @@ import {
 } from './store.js';
 import { openViewer } from './viewer.js';
 import { isKey, comboOf, ACTIONS, SCOPES, keysFor, defaultKeys, prettyCombo, conflicts } from './keys.js';
-import { t, setLanguage, translateDom, LANGS } from './i18n.js';
+import { t, LANGS, uiLocale } from './i18n.js';
 import { startSlideshow, exportDialog, collageDialog, renderMap, renderDuplicates } from './tools.js';
 import { isIdentity } from './pipeline.js';
 
-const MONTH = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' });
+const MONTH = new Intl.DateTimeFormat(uiLocale(), { month: 'long', year: 'numeric' });
 
 // ---------------- view selection ----------------
 function visiblePhotos() {
@@ -217,24 +217,24 @@ const io = new IntersectionObserver((entries) => {
 
 export function tile(p, { selectable = true } = {}) {
   const ar = p.w && p.h ? Math.min(3, Math.max(0.4, p.w / p.h)) : 1.4;
-  const t = h('div', {
+  const el = h('div', {
     class: 'tile' + (state.sel.has(p.id) ? ' selected' : '') + (p.thumb ? ' has-thumb' : ''),
     'data-id': p.id, draggable: 'true',
     style: { width: `calc(${ar} * var(--thumb-h))`, flexGrow: ar },
   });
   const img = h('img', { class: 'thumb', alt: '', loading: 'lazy', decoding: 'async' });
-  img.onload = () => { img.classList.add('ready'); t.classList.add('has-thumb'); };
-  if (p.thumb) img.src = thumbUrl(p); else io.observe(t);
-  t.append(img, h('div', { class: 'shade' }));
-  if (selectable) t.append(h('div', { class: 'check', html: icon('check') }));
-  t.append(h('button', { class: 'fav' + (p.star ? ' on' : ''), title: p.star ? t('Unfavorite') : t('Favorite'), html: icon('star'),
+  img.onload = () => { img.classList.add('ready'); el.classList.add('has-thumb'); };
+  if (p.thumb) img.src = thumbUrl(p); else io.observe(el);
+  el.append(img, h('div', { class: 'shade' }));
+  if (selectable) el.append(h('div', { class: 'check', html: icon('check') }));
+  el.append(h('button', { class: 'fav' + (p.star ? ' on' : ''), title: p.star ? t('Unfavorite') : t('Favorite'), html: icon('star'),
     onclick: (e) => { e.stopPropagation(); patchPhotos([p.id], { star: !p.star }); } }));
   const badges = [];
   if (!isIdentity(p.edits)) badges.push(h('span', { class: 'b', html: icon('edit') }));
   if (p.albums.length) badges.push(h('span', { class: 'b', html: icon('album') + p.albums.length }));
-  if (badges.length) t.append(h('div', { class: 'badges' }, badges));
-  t.append(h('div', { class: 'cap' }, p.caption || p.name));
-  return t;
+  if (badges.length) el.append(h('div', { class: 'badges' }, badges));
+  el.append(h('div', { class: 'cap' }, p.caption || p.name));
+  return el;
 }
 
 function renderGrid(list, content) {
@@ -435,7 +435,7 @@ function showMenu(x, y, items) {
   m.style.top = Math.min(y, innerHeight - r.height - 8) + 'px';
 }
 function hideMenu() { $('#ctxmenu').classList.remove('show'); }
-document.addEventListener('mousedown', (e) => { if (!e.target.closest('#ctxmenu')) hideMenu(); });
+document.addEventListener('mousedown', (e) => { if (!e.target.closest?.('#ctxmenu')) hideMenu(); });
 
 function tileMenu(p, x, y) {
   if (!state.sel.has(p.id)) { state.sel.clear(); state.sel.add(p.id); refreshSelection(); }
@@ -464,9 +464,9 @@ function tileMenu(p, x, y) {
 // ---------------- events ----------------
 const content = $('#content');
 content.addEventListener('click', (e) => {
-  const t = e.target.closest('.tile[data-id]');
-  if (!t || e.target.closest('.fav')) return;
-  const id = t.dataset.id;
+  const el = e.target.closest('.tile[data-id]');
+  if (!el || e.target.closest('.fav')) return;
+  const id = el.dataset.id;
   const p = state.byId.get(id);
   const inSet = state.current.includes(p);
   if (e.shiftKey && state.lastSel && inSet) {
@@ -476,25 +476,25 @@ content.addEventListener('click', (e) => {
     state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id);
     state.lastSel = id;
   } else {
-    const list = inSet ? state.current : t.closest('.dup-items') ? [...t.closest('.dup-items').querySelectorAll('.tile')].map((x) => state.byId.get(x.dataset.id)) : [p];
+    const list = inSet ? state.current : el.closest('.dup-items') ? [...t.closest('.dup-items').querySelectorAll('.tile')].map((x) => state.byId.get(x.dataset.id)) : [p];
     return openViewer(list, list.indexOf(p));
   }
   refreshSelection();
 });
 content.addEventListener('dblclick', (e) => {
-  const t = e.target.closest('.tile[data-id]');
-  if (t && state.sel.size) { const p = state.byId.get(t.dataset.id); openViewer(state.current, state.current.indexOf(p)); }
+  const el = e.target.closest('.tile[data-id]');
+  if (el && state.sel.size) { const p = state.byId.get(el.dataset.id); openViewer(state.current, state.current.indexOf(p)); }
 });
 content.addEventListener('contextmenu', (e) => {
-  const t = e.target.closest('.tile[data-id]');
-  if (!t) return;
+  const el = e.target.closest('.tile[data-id]');
+  if (!el) return;
   e.preventDefault();
-  tileMenu(state.byId.get(t.dataset.id), e.clientX, e.clientY);
+  tileMenu(state.byId.get(el.dataset.id), e.clientX, e.clientY);
 });
 content.addEventListener('dragstart', (e) => {
-  const t = e.target.closest('.tile[data-id]');
-  if (!t) return;
-  const ids = state.sel.has(t.dataset.id) ? [...state.sel] : [t.dataset.id];
+  const el = e.target.closest('.tile[data-id]');
+  if (!el) return;
+  const ids = state.sel.has(el.dataset.id) ? [...state.sel] : [el.dataset.id];
   e.dataTransfer.setData('application/x-lumen', JSON.stringify(ids));
   e.dataTransfer.effectAllowed = 'copy';
 });
@@ -825,7 +825,7 @@ function shortcutsTable() {
 
 document.addEventListener('keydown', (e) => {
   if ($('.pv') || $('#viewer').classList.contains('show') || $('#slideshow').classList.contains('show') || $('#modal').classList.contains('show')) return;
-  const typing = e.target.matches('input, textarea, select');
+  const typing = e.target.matches?.('input, textarea, select');
   const searchKey = isKey(e, 'lib.search');
   if (searchKey && (!typing || /^Ctrl\+/.test(comboOf(e)))) { e.preventDefault(); $('#search').focus(); $('#search').select(); return; }
   if (typing) { if (e.key === 'Escape') e.target.blur(); return; }

@@ -12,7 +12,8 @@ const preload = path.join(HERE, 'preload.cjs');
 const icon = path.join(HERE, '..', 'public', 'icon.png');
 
 // The app was called Lumen before: keep using its library (stars, albums, edits) under the new name.
-const dataDir = path.join(app.getPath('appData'), 'Captura');
+// CAPTURA_DATA (dev/demo only) points the app at a separate library folder.
+const dataDir = process.env.CAPTURA_DATA ? path.resolve(process.env.CAPTURA_DATA) : path.join(app.getPath('appData'), 'Captura');
 const oldDir = path.join(app.getPath('appData'), 'Lumen');
 if (!fs.existsSync(path.join(dataDir, 'library.json')) && fs.existsSync(path.join(oldDir, 'library.json'))) {
   try {
@@ -241,7 +242,7 @@ function buildTray() {
   tray = new Tray(nativeImage.createFromPath(icon).resize({ width: 16, height: 16 }));
   tray.setToolTip('Captura');
   const hk = () => ({ ...DEFAULT_HOTKEYS, ...(settings().hotkeys || {}) });
-  const label = (t, m) => (hk()[m] ? `${t}\t${hk()[m].replace('Control', 'Ctrl')}` : t);
+  const label = (text, m) => (hk()[m] ? `${text}\t${hk()[m].replace('Control', 'Ctrl')}` : text);
   const menu = () => Menu.buildFromTemplate([
     { label: label(t('Capture region'), 'region'), click: () => runCapture('region') },
     { label: label(t('Capture active window'), 'window'), click: () => runCapture('window') },

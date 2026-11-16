@@ -97,6 +97,7 @@ export default {
   "Dark": "Тёмная",
   "Days with lots of photos, grouped automatically.": "Дни с большим количеством фото, сгруппированные автоматически.",
   "Default": "По умолчанию",
+  "Delete": "Удалить",
   "Delete album": "Удалить альбом",
   "Delete selected annotation": "Удалить выбранную аннотацию",
   "Delete “{name}”?": "Удалить «{name}»?",

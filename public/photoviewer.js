@@ -520,7 +520,7 @@ function saveSetting(k, v) { state.settings = { ...state.settings, [k]: v }; api
 
 function onKey(e) {
   if (!PV.root || document.querySelector('#modal.show, #viewer.show, #slideshow.show')) return;
-  if (e.target.matches('input, textarea, select')) return;
+  if (e.target.matches?.('input, textarea, select')) return;
   let handled = true;
   if (e.key === 'Escape') { if (E.menu.classList.contains('show')) E.menu.classList.remove('show'); else if (PV.mode !== 'fit') setFit(); else closePhotoViewer(); }
   else if (isKey(e, 'pv.next')) go(1);

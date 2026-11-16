@@ -1,0 +1,16 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Captura pages are served by the app's own server on 127.0.0.1",
+  "windows": ["*"],
+  "remote": { "urls": ["http://127.0.0.1:*"] },
+  "permissions": [
+    "core:default",
+    "allow-lumen-win",
+    "allow-capture-init",
+    "allow-capture-done",
+    "allow-copy-image",
+    "allow-pin-image",
+    "allow-pin-data"
+  ]
+}

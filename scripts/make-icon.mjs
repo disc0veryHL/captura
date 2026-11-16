@@ -94,8 +94,17 @@ const dir = Buffer.concat(sizes.map((s, i) => {
   e.writeUInt32LE(pngs[i].length, 8); e.writeUInt32LE(offset, 12); offset += pngs[i].length;
   return e;
 }));
+const ico = Buffer.concat([header, dir, ...pngs]);
 fs.mkdirSync(path.join(root, 'build'), { recursive: true });
-fs.writeFileSync(path.join(root, 'build', 'icon.ico'), Buffer.concat([header, dir, ...pngs]));
+fs.writeFileSync(path.join(root, 'build', 'icon.ico'), ico);
 fs.writeFileSync(path.join(root, 'public', 'icon.png'), pngs[sizes.indexOf(256)]);
+// Tauri bundle icons
+const icons = path.join(root, 'src-tauri', 'icons');
+fs.mkdirSync(icons, { recursive: true });
+fs.writeFileSync(path.join(icons, 'icon.ico'), ico);
+fs.writeFileSync(path.join(icons, '32x32.png'), pngs[sizes.indexOf(32)]);
+fs.writeFileSync(path.join(icons, '128x128.png'), pngs[sizes.indexOf(128)]);
+fs.writeFileSync(path.join(icons, '128x128@2x.png'), pngs[sizes.indexOf(256)]);
+fs.writeFileSync(path.join(icons, 'icon.png'), pngs[sizes.indexOf(256)]);
 fs.writeFileSync(path.join(root, 'public', 'icon.svg'), `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><image href="icon.png" width="64" height="64"/></svg>`);
 console.log('icons written');

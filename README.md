@@ -6,11 +6,12 @@
 
 **Your photo library, a fast Picasa-style viewer and a ShareX-style screenshot tool — in one Windows app.**
 
-Everything runs locally. Your original photos are never modified.
+Native Rust app · 2 MB installer · everything runs locally · your original photos are never modified.
 
-<a href="../../releases/latest"><img src="https://img.shields.io/badge/Download-Windows%20installer-7c8cff?style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows"></a>
+<a href="../../releases/latest"><img src="https://img.shields.io/badge/Download-Windows%20installer%20(2%20MB)-7c8cff?style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows"></a>
 
 <img src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0e0f13?style=flat-square" alt="Windows 10 and 11">
+<img src="https://img.shields.io/badge/built%20with-Rust%20%2B%20Tauri%202-dea584?style=flat-square&logo=rust&logoColor=white" alt="Rust and Tauri">
 <img src="https://img.shields.io/badge/languages-EN%20%C2%B7%20ES%20%C2%B7%20FR%20%C2%B7%20RU%20%C2%B7%20ZH-b07cff?style=flat-square" alt="Languages">
 <img src="https://img.shields.io/badge/license-MIT-2fbf71?style=flat-square" alt="MIT license">
 
@@ -124,32 +125,43 @@ working with any keyboard layout.
 
 ## 📥 Install
 
-1. Download **Captura-Setup.exe** from [Releases](../../releases/latest).
+1. Download **Captura_2.0.0_x64-setup.exe** from [Releases](../../releases/latest).
 2. Run it — it installs for your user, no admin rights needed.
 3. Optional: right-click a photo → **Open with** → **Captura** → *Always* to make it your viewer.
 
-The installer adds Start menu and desktop shortcuts and registers Captura in Explorer's **Open with** list
-without taking over your current default app. Uninstall from *Settings → Apps*; your library is kept in
-`%APPDATA%\Captura`.
+The installer adds a Start menu shortcut and registers Captura in Explorer's **Open with** list
+without taking over your current default app. Closing the window keeps Captura in the tray so the
+capture hotkeys keep working (turn this off in Settings). Uninstall from *Settings → Apps*; your library
+is kept in `%APPDATA%\Captura`.
+
+## 🧩 How it's built
+
+```
+┌──────────────────────────── Captura.exe (Rust) ────────────────────────────┐
+│  Tauri 2 shell     windows · tray · global hotkeys · single instance        │
+│  capture.rs        xcap screen/window grabs · crops · window snapping       │
+│  server.rs         library index · EXIF · scans · exports (127.0.0.1 only)  │
+│  meta.rs           image size + EXIF reader                                 │
+└───────────────────────────────────┬─────────────────────────────────────────┘
+                                    │  system WebView2 renders the UI
+                        public/  ── library · viewer · editors · overlay
+```
+
+The UI is drawn by Windows' own WebView2, so there is no bundled browser — the app is a single
+6 MB executable.
 
 ## 🛠️ Build from source
 
-Requires Node.js 22.23.4+ or 24.22.1+.
+Requires [Rust](https://rustup.rs) (MSVC toolchain) and Node.js 22.23.4+ or 24.22.1+.
 
 ```bash
 npm install
-npm run vendor     # copy map libraries into public/vendor
-npm run icon       # render the app icon
-npm start          # run the app
+npm run dev        # run the app
+npm run build      # installer: src-tauri/target/release/bundle/nsis/Captura_<version>_x64-setup.exe
 ```
 
-```bash
-npm run pack       # portable build:  dist/Captura-win32-x64
-npm run installer  # installer:       dist/installer/Captura-Setup-<version>.exe
-```
-
-> NSIS cannot handle very long paths. If `npm run installer` fails with `!include: could not open file`,
-> build from a folder with a shorter path.
+> On Windows the MSVC linker fails on very long paths (`LNK1104`). If that happens, set a short
+> target folder first, for example `set CARGO_TARGET_DIR=C:\ctb`.
 
 `node scripts/demo-photos.mjs <folder>` renders the demo landscapes used in these screenshots.
 
@@ -158,12 +170,15 @@ npm run installer  # installer:       dist/installer/Captura-Setup-<version>.exe
 
 | Path | What |
 | --- | --- |
-| `electron/` | main process — windows, tray, hotkeys, screen capture, IPC |
-| `lib/` | local server — library index, EXIF, thumbnail cache, exports |
+| `src-tauri/src/main.rs` | windows, tray, hotkeys, capture flow, pins, IPC commands |
+| `src-tauri/src/server.rs` | local server — library index, scans, thumbnails, exports |
+| `src-tauri/src/capture.rs` | screen and window capture |
+| `src-tauri/src/meta.rs` | image size and EXIF |
+| `src-tauri/src/i18n.rs` | tray and notification strings |
 | `public/` | UI — library, viewer, editors, region overlay |
 | `public/locales/` | translations (es, fr, ru, zh) |
 | `scripts/` | icon renderer, vendor copy, demo photos |
-| `build/installer.nsh` | installer additions (Open with registration) |
+| `build/tauri-hooks.nsh` | installer additions (Open with registration) |
 
 </details>
 

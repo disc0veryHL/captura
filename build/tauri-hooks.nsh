@@ -1,4 +1,4 @@
-; Captura installer additions (per-user, HKCU).
+; Captura installer hooks (Tauri NSIS, per-user, HKCU).
 ; Adds Captura to Explorer's "Open with" list for image types WITHOUT taking over
 ; the current default app — the user picks it as default in Windows if they want.
 
@@ -11,7 +11,7 @@
   DeleteRegValue HKCU "Software\Classes\.${EXT}\OpenWithProgids" "Captura.Image"
 !macroend
 
-!macro customInstall
+!macro NSIS_HOOK_POSTINSTALL
   WriteRegStr HKCU "Software\Classes\Captura.Image" "" "Captura image"
   WriteRegStr HKCU "Software\Classes\Captura.Image" "FriendlyTypeName" "Captura image"
   WriteRegStr HKCU "Software\Classes\Captura.Image\DefaultIcon" "" "$INSTDIR\Captura.exe,0"
@@ -31,7 +31,7 @@
   System::Call 'shell32::SHChangeNotify(i 0x08000000, i 0, i 0, i 0)'
 !macroend
 
-!macro customUnInstall
+!macro NSIS_HOOK_PREUNINSTALL
   !insertmacro capturaUnassoc "jpg"
   !insertmacro capturaUnassoc "jpeg"
   !insertmacro capturaUnassoc "jfif"
@@ -43,7 +43,6 @@
   DeleteRegKey HKCU "Software\Classes\Captura.Image"
   DeleteRegKey HKCU "Software\Classes\Applications\Captura.exe"
   ; remove the "Start with Windows" entry if it was turned on
-  DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "app.captura.desktop"
   DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "Captura"
   System::Call 'shell32::SHChangeNotify(i 0x08000000, i 0, i 0, i 0)'
 !macroend

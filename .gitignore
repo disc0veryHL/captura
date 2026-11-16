@@ -8,3 +8,7 @@ graphify-out/
 *.log
 .DS_Store
 Thumbs.db
+
+# Rust / Tauri
+src-tauri/target/
+src-tauri/gen/

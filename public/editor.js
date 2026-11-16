@@ -638,7 +638,18 @@ async function save(mode) {
   toast(res.overwritten ? t('Saved') : t('Saved as {name}', { name: res.path.split(/[\\/]/).pop() }));
 }
 
-window.addEventListener('beforeunload', (e) => { if (dirty()) { e.preventDefault(); e.returnValue = ''; } });
+if (native?.on) {
+  // the native window asks before closing; unsaved annotations get a choice
+  native.on('close-request', () => {
+    finishText();
+    if (!dirty()) return native.win('close-force');
+    modal({ title: t('Discard changes?'), body: h('p', {}, t('Your edits to this photo have not been saved.')),
+      actions: [{ label: t('Keep editing') }, { label: t('Discard'), danger: true, run: () => native.win('close-force') },
+        { label: t('Save'), primary: true, run: async () => { await save(); if (!dirty()) native.win('close-force'); } }] });
+  });
+} else {
+  window.addEventListener('beforeunload', (e) => { if (dirty()) { e.preventDefault(); e.returnValue = ''; } });
+}
 
 // ---------------- keyboard ----------------
 document.addEventListener('keydown', (e) => {

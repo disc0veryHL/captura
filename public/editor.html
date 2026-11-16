@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" data-entry="editor.js" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Captura Editor</title>
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="editor.css">
+</head>
+<body class="ed">
+  <header class="ed-top">
+    <div class="ed-tools" id="tools"></div>
+    <div class="ed-actions" id="actions"></div>
+  </header>
+  <div class="ed-opts" id="opts"></div>
+  <main class="ed-stage" id="stage">
+    <div class="ed-canvas-wrap" id="wrap"><canvas id="cv"></canvas></div>
+  </main>
+  <footer class="ed-status" id="status"></footer>
+  <div id="modal"></div>
+  <div id="toast"></div>
+  <script type="module" src="boot.js"></script>
+</body>
+</html>

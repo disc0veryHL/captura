@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-entry="app.js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Captura</title>
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="vendor/leaflet.css">
+  <link rel="stylesheet" href="vendor/MarkerCluster.css">
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="photoviewer.css">
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <div class="brand"><span class="brand-mark"></span><span>Captura</span></div>
+      <nav id="nav"></nav>
+      <div id="scan-status"></div>
+    </aside>
+    <main id="main">
+      <header id="topbar">
+        <div class="title-wrap">
+          <h1 id="view-title">Photos</h1>
+          <span id="view-sub"></span>
+        </div>
+        <div class="search">
+          <span class="search-ic"></span>
+          <input id="search" type="search" placeholder="Search names, places, cameras, tags, dates…" data-i18n-placeholder="Search names, places, cameras, tags, dates…" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="top-actions">
+          <select id="sort" class="select" title="Sort" data-i18n-title="Sort">
+            <option value="date-desc" data-i18n="Newest first">Newest first</option>
+            <option value="date-asc" data-i18n="Oldest first">Oldest first</option>
+            <option value="name" data-i18n="Name">Name</option>
+            <option value="size" data-i18n="File size">File size</option>
+          </select>
+          <input id="zoom" type="range" min="120" max="360" step="10" title="Thumbnail size" data-i18n-title="Thumbnail size">
+          <button id="btn-slideshow" class="icon-btn" title="Slideshow (current view)" data-i18n-title="Slideshow (current view)"></button>
+          <button id="btn-theme" class="icon-btn" title="Toggle theme" data-i18n-title="Toggle theme"></button>
+        </div>
+      </header>
+      <section id="content" tabindex="-1"></section>
+      <div id="selbar"></div>
+    </main>
+  </div>
+
+  <div id="viewer" class="overlay"></div>
+  <div id="slideshow" class="overlay"></div>
+  <div id="modal"></div>
+  <div id="ctxmenu"></div>
+  <div id="toast"></div>
+  <div id="drop-hint" data-i18n="Drop a folder to add it to your library">Drop a folder to add it to your library</div>
+
+  <script src="vendor/leaflet.js"></script>
+  <script src="vendor/leaflet.markercluster.js"></script>
+  <script type="module" src="boot.js"></script>
+</body>
+</html>

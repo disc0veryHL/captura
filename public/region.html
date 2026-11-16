@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en" data-entry="region.js">
+<head>
+  <meta charset="utf-8">
+  <title>Captura capture</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #000; cursor: none; user-select: none; }
+    canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+    #hint { position: fixed; top: 18px; left: 50%; translate: -50%; padding: 8px 16px; border-radius: 999px; background: rgba(12, 12, 15, .82); color: #eee; font: 500 13px "Segoe UI Variable Text", "Segoe UI", sans-serif; pointer-events: none; transition: opacity .3s; box-shadow: 0 6px 24px rgba(0, 0, 0, .4); }
+    #hint b { color: #c79bff; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div id="hint"><b>Drag</b> to select · <b>Click</b> a window · <b>Enter</b> whole screen · <b>Shift</b> square · <b>Esc</b> cancel</div>
+  <script type="module" src="boot.js"></script>
+</body>
+</html>

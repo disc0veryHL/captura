@@ -1,0 +1,57 @@
+{
+  "name": "captura",
+  "productName": "Captura",
+  "version": "1.0.0",
+  "description": "Captura — photo library, Picasa-style viewer and screenshot tool for Windows",
+  "author": "Captura",
+  "main": "electron/main.mjs",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "serve": "node lib/server.mjs",
+    "vendor": "node scripts/vendor.mjs",
+    "icon": "node scripts/make-icon.mjs",
+    "pack": "npm run vendor && npm run icon && electron-packager . Captura --platform=win32 --arch=x64 --icon=build/icon.ico --out=dist --overwrite --asar --app-copyright=\"Captura\" --win32metadata.FileDescription=Captura --win32metadata.ProductName=Captura --ignore=\"^/(dist|build|scripts|node_modules/(?!$))\"",
+    "installer": "npm run vendor && npm run icon && electron-builder --win nsis --x64"
+  },
+  "allowScripts": {
+    "electron": true
+  },
+  "build": {
+    "appId": "app.captura.desktop",
+    "productName": "Captura",
+    "copyright": "Captura",
+    "directories": { "output": "dist/installer", "buildResources": "build" },
+    "files": ["electron/**", "lib/**", "public/**", "package.json"],
+    "asar": true,
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "build/icon.ico",
+      "executableName": "Captura"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Captura",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "uninstallDisplayName": "Captura",
+      "artifactName": "Captura-Setup-${version}.exe",
+      "include": "build/installer.nsh",
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": true
+    }
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "electron": "44.10.1",
+    "electron-builder": "26.18.1",
+    "leaflet": "1.9.4",
+    "leaflet.markercluster": "1.5.3"
+  }
+}

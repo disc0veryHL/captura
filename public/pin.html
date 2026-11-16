@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Captura pin</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; }
+    body { -webkit-app-region: drag; cursor: move; }
+    img { width: 100%; height: 100%; display: block; object-fit: contain; pointer-events: none; box-shadow: 0 0 0 1px rgba(124, 92, 255, .9) inset; }
+    #z { position: fixed; right: 6px; bottom: 6px; padding: 2px 8px; border-radius: 999px; background: rgba(0, 0, 0, .65); color: #fff; font: 600 11px "Segoe UI", sans-serif; opacity: 0; transition: opacity .3s; }
+    #z.on { opacity: 1; }
+  </style>
+</head>
+<body>
+  <img id="img" alt="">
+  <div id="z"></div>
+  <script>
+    // Pinned screenshot: drag to move, wheel to resize, double-click or Esc to close, right-click for options.
+    const z = document.getElementById('z');
+    let t;
+    window.lumenNative.pinData().then((d) => { document.getElementById('img').src = d; });
+    window.addEventListener('wheel', async (e) => {
+      const pct = await window.lumenNative.win('pin-zoom', e.deltaY < 0 ? 1.1 : 1 / 1.1);
+      z.textContent = Math.round(pct) + '%'; z.classList.add('on'); clearTimeout(t); t = setTimeout(() => z.classList.remove('on'), 900);
+    });
+    window.addEventListener('dblclick', () => window.lumenNative.win('close'));
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') window.lumenNative.win('close'); });
+    window.addEventListener('contextmenu', (e) => { e.preventDefault(); window.lumenNative.win('pin-menu'); });
+  </script>
+</body>
+</html>
